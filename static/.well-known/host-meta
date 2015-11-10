@@ -1,0 +1,49 @@
+ <?xml version='1.0' encoding='UTF-8'?>
+    <XRD xmlns='http://docs.oasis-open.org/ns/xri/xrd-1.0'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
+      <Link rel='timegate' 
+            template='http://mementoarchive.lanl.gov/ta/timegate/http://lanlsource.lanl.gov/{path}'>
+      </Link>
+      <Link rel='timemap' 
+            template='http://mementoarchive.lanl.gov/list/timemap/link/http://lanlsource.lanl.gov/{path}'>
+      </Link>
+        <Link rel='timegate'
+            template='http://mementoarchive.lanl.gov/tr/timegate/http://lanlsource.lanl.gov/{path}'>
+      </Link>
+      <Link rel='timemap'
+            template='http://mementoarchive.lanl.gov/tr/timemap/link/http://lanlsource.lanl.gov/{path}'>
+      </Link>
+      <Link rel='timegate'
+            template='http://mementoarchive.lanl.gov/tr/timegate/http://www.mementoweb.org/{path}'>
+      </Link>
+      <Link rel='timemap'
+            template='http://mementoarchive.lanl.gov/tr/timemap/link/http://www.mementoweb.org/{path}'>
+      </Link>
+
+      <Link rel='timegate'
+            template='http://mementoarchive.lanl.gov/tr/timegate/http://www.shared-canvas.org/{path}'>
+      </Link>
+      <Link rel='timemap'
+            template='http://mementoarchive.lanl.gov/tr/timemap/link/http://www.shared-canvas.org/{path}'>
+      </Link>
+
+       <Link rel='timegate'
+            template='http://mementoarchive.lanl.gov/twa/timegate/http://lanlsource.lanl.gov/{path}'>
+      </Link>
+      <Link rel='timemap'
+            template='http://mementoarchive.lanl.gov/twa/timemap/link/http://lanlsource.lanl.gov/{path}'>
+      </Link>
+      <Link rel='timegate'
+            template='http://mementoarchive.lanl.gov/twa/timegate/http://www.mementoweb.org/{path}'>
+      </Link>
+      <Link rel='timemap'
+            template='http://mementoarchive.lanl.gov/twa/timemap/link/http://www.mementoweb.org/{path}'>
+      </Link>
+
+      <Link rel='timegate'
+            template='http://mementoarchive.lanl.gov/twa/timegate/http://www.shared-canvas.org/{path}'>
+      </Link>
+      <Link rel='timemap'
+            template='http://mementoarchive.lanl.gov/twa/timemap/link/http://www.shared-canvas.org/{path}'>
+      </Link>
+    </XRD>

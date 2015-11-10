@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:dbpprop="http://dbpedia.org/property/" xmlns:owl="http://www.w3.org/2002/07/owl#" 
+    version="XHTML+RDFa 1.0" xml:lang="en">
+
+
+<!-- header -->
+<head profile="http://www.w3.org/1999/xhtml/vocab">
+    <title>About: %(TNAME)s</title>
+    <link rel="alternate" type="application/rdf+xml" href="http://dbpedia.org/data/%(NAME)s.rdf" title="RDF/XML Representation" />
+    <link rel="alternate" type="text/rdf+n3" href="http://dbpedia.org/data/%(NAME)s.n3" title="RDF N3/Turtle Representation" />
+    <link rel="alternate" type="application/json+rdf" href="http://dbpedia.org/data/%(NAME)s.jrdf" title="RDF/JSON Representation" />
+    <link rel="alternate" type="application/json" href="http://dbpedia.org/data/%(NAME)s.json" title="RDF/JSON Representation" />
+    <link rel="stylesheet" type="text/css" href="/statics/style.css" />
+    <link href="/statics/highlighter.css" type="text/css" rel="stylesheet" charset="utf-8" />
+    <script type="text/javascript" src="/statics/script.js"></script>
+</head>
+<body onload="init();" about="http://dbpedia.org/resource/%(NAME)s">
+    <div id="header">
+      <div id="hd_l">
+	  <h1 id="title">About: <a href="http://dbpedia.org/resource/%(NAME)s">%(TNAME)s</a></h1>
+        <div id="homelink">
+          <!--?vsp if (white_page = 0) http (txt); ?-->
+        </div>
+	<div class="page-resource-uri">
+	   An Entity in Data Space: <a href="http://dbpedia.org">dbpedia.org</a>
+        </div>
+      </div> <!-- hd_l -->
+      <div id="hd_r">
+        <a href="http://dbpedia.org/data/%(NAME)s.rdf" title="RDF data">
+	  <img src="/statics/sw-cube.png" alt="[RDF Data]"/>
+        </a>
+      </div> <!-- hd_r -->
+    </div> <!-- header -->
+    <div id="content">
+
+      <p>%(DESC)s</p>
+
+<!-- proptable -->
+      <table class="description"><tr><th>Property</th><th>Value</th></tr>
+
+%(TABLE)s
+
+      </table>
+    </div> <!--  #content -->
+
+
+<!-- footer -->
+    <div id="footer">
+      <div id="ft_t">
+        Browse using:
+	<a href="http://linkeddata.uriburner.com/ode/?uri=http%%3A%%2F%%2Fdbpedia.org%%2Fresource%%2F%(NAME)s">OpenLink Data Explorer</a> |
+
+
+        <a href="http://dataviewer.zitgist.com/?uri=http%%3A%%2F%%2Fdbpedia.org%%2Fresource%%2F%(NAME)s">Zitgist Data Viewer</a> |
+        <a href="http://beckr.org/marbles?uri=http%%3A%%2F%%2Fdbpedia.org%%2Fresource%%2F%(NAME)s">Marbles</a> |
+        <a href="http://www4.wiwiss.fu-berlin.de/rdf_browser/?browse_uri=http%%3A%%2F%%2Fdbpedia.org%%2Fresource%%2F%(NAME)s">DISCO</a> |
+        <a href="http://dig.csail.mit.edu/2005/ajar/release/tabulator/0.8/tab.html?uri=http%%3A%%2F%%2Fdbpedia.org%%2Fresource%%2F%(NAME)s" >Tabulator</a>
+        &nbsp; &nbsp; Raw Data in:
+        <a href="http://dbpedia.org/data/%(NAME)s.n3">N3/Turtle</a> |
+	<a href="http://dbpedia.org/data/%(NAME)s.json">JSON+RDF</a> |
+        <a href="http://dbpedia.org/data/%(NAME)s.rdf">RDF/XML</a> 
+        &nbsp; &nbsp;<a href="http://wiki.dbpedia.org/Imprint">About</a>&nbsp; &nbsp;
+      </div> <!-- #ft_t -->
+
+      <div id="ft_b">
+        <a href="http://virtuoso.openlinksw.com" title="OpenLink Virtuoso"><img class="powered_by" src="/statics/virt_power_no_border.png" alt="Powered by OpenLink Virtuoso"/></a>
+        <a href="http://linkeddata.org/"><img alt="This material is Open Knowledge" src="/statics/LoDLogo.gif"/></a> &nbsp;
+        <a href="http://dbpedia.org/sparql"><img alt="W3C Semantic Web Technology" src="/statics/sw-sparql-blue.png"/></a> &nbsp;  &nbsp;
+        <a href="http://www.opendefinition.org/"><img alt="This material is Open Knowledge" src="/statics/od_80x15_red_green.png"/></a>
+      </div> <!-- #ft_b -->
+    </div> <!-- #footer -->
+    <!--script type="text/javascript">
+     Place any Javascript code e.g. Google Analytics scripts 
+    </script-->
+
+ </body>
+</html>

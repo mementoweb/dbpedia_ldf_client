@@ -1,0 +1,102 @@
+{
+  "title": "My Linked Data Fragments server",
+  "baseURL": "http://labs.mementoweb.org/",
+  "timegates": {
+      "baseURL": "/timegate/",
+      "mementos": {
+          "dbpedia": {
+              "versions": [
+                  "dbpedia_2015",
+                  "dbpedia_3_8"
+              ]
+          }
+      }
+  },
+
+  "datasources": {
+    "dbpedia": {
+      "title":       "DBpedia 2015",
+      "description": "DBpedia 2015 with an HDT back-end",
+      "license":     "Creative Commons Attribution-ShareAlike 3.0",
+      "licenseUrl":  "https://creativecommons.org/licenses/by-sa/3.0/",
+      "copyright":   "The DBpedia dataset is Open Knowledge.",
+      "homepage":    "http://dbpedia.org/",
+      "type":        "HdtDatasource",
+      "settings":    {
+          "file": "/data1/dbpedia/cdata_2015.hdt"
+      },
+      "timegate": true
+    },
+    "dbpedia_2015": {
+      "title":       "DBpedia v2015",
+      "description": "DBpedia v2015 with an HDT back-end",
+      "license":     "Creative Commons Attribution-ShareAlike 3.0",
+      "licenseUrl":  "https://creativecommons.org/licenses/by-sa/3.0/",
+      "copyright":   "The DBpedia dataset is Open Knowledge.",
+      "homepage":    "http://dbpedia.org/",
+      "type":        "HdtDatasource",
+      "settings":    {
+          "file": "/data1/dbpedia/cdata_2015.hdt"
+      },
+      "memento": {
+          "interval": ["2013-06-15T00:00:00Z", "2014-09-14T11:59:59Z"]
+      }
+    },
+    "dbpedia_3_8": {
+      "title":       "DBpedia v3.8",
+      "description": "DBpedia v3.8 with an HDT back-end",
+      "license":     "Creative Commons Attribution-ShareAlike 3.0",
+      "licenseUrl":  "https://creativecommons.org/licenses/by-sa/3.0/",
+      "copyright":   "The DBpedia dataset is Open Knowledge.",
+      "homepage":    "http://dbpedia.org/",
+      "type":        "HdtDatasource",
+      "settings":    {
+          "file": "/data1/dbpedia/cdata_3_8.hdt"
+      },
+      "memento": {
+          "interval": ["2012-07-15T00:00:00Z", "2013-06-14T11:59:59Z"]
+      }
+    }
+  },
+
+  "dereference": {
+  },
+  
+  "controllers": [
+    "TimegateController",
+    "SummaryController",
+    "TriplePatternFragmentsController",
+    "AssetsController",
+    "DereferenceController",
+    "NotFoundController"
+  ],
+
+  "routers": [
+    { "type": "DatasourceRouter" },
+    { "type": "TriplePatternRouter" },
+    { "type": "PageRouter", "settings": { "pageSize": 500 } }
+  ],
+
+  "prefixes": {
+    "rdf":         "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs":        "http://www.w3.org/2000/01/rdf-schema#",
+    "owl":         "http://www.w3.org/2002/07/owl#",
+    "skos":        "http://www.w3.org/2004/02/skos/core#",
+    "xsd":         "http://www.w3.org/2001/XMLSchema#",
+    "dc":          "http://purl.org/dc/terms/",
+    "dcterms":     "http://purl.org/dc/terms/",
+    "dc11":        "http://purl.org/dc/elements/1.1/",
+    "foaf":        "http://xmlns.com/foaf/0.1/",
+    "geo":         "http://www.w3.org/2003/01/geo/wgs84_pos#",
+    "dbpedia":     "http://dbpedia.org/resource/",
+    "dbpedia-owl": "http://dbpedia.org/ontology/",
+    "dbpprop":     "http://dbpedia.org/property/",
+    "hydra":       "http://www.w3.org/ns/hydra/core#",
+    "void":        "http://rdfs.org/ns/void#"
+  },
+
+  "logging": {
+    "enabled": true,
+    "file": "access.log"
+  }
+}
