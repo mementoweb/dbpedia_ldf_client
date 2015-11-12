@@ -4,7 +4,7 @@ Displays the memento page of a dbpedia resource.
 
 from urllib.parse import urlparse, unquote, parse_qs, quote
 import rdflib
-from dbp_client import logging, LDF_MEMENTO_URL,\
+from dbpedia_ldf_client import logging, LDF_MEMENTO_URL,\
     NAMESPACES, LITERAL_TEMPLATE, URI_TEMPLATE,\
     ROW_TEMPLATE, HTML_TEMPLATE, DBPEDIA_VERSIONS, SERIALIZERS, TIMEGATE_PATH
 import re

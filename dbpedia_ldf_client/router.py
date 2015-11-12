@@ -2,10 +2,10 @@
 The WSGI application. Will route the requests to the appropriate handlers.
 """
 
-from dbp_client import SERVER_PATH, TIMEGATE_PATH, MEMENTO_PATH
-from dbp_client.timegate_handler import TimegateHandler
-from dbp_client.memento_handler import MementoHandler
-from dbp_client.client_handler import ClientHandler
+from dbpedia_ldf_client import SERVER_PATH, TIMEGATE_PATH, MEMENTO_PATH
+from dbpedia_ldf_client.timegate_handler import TimegateHandler
+from dbpedia_ldf_client.memento_handler import MementoHandler
+from dbpedia_ldf_client.client_handler import ClientHandler
 
 
 __author__ = 'Harihar Shankar'

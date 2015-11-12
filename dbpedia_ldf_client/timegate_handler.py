@@ -6,7 +6,7 @@ response. May make multiple queries to the LDF server for one request.
 
 import requests
 from urllib.parse import quote, urlparse, unquote
-from dbp_client import logging, LDF_TIMEGATE_URL, MEMENTO_PATH, DBPEDIA_VERSIONS
+from dbpedia_ldf_client import logging, LDF_TIMEGATE_URL, MEMENTO_PATH, DBPEDIA_VERSIONS
 from memento_client import MementoClient
 from datetime import datetime
 
