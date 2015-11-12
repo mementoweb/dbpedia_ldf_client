@@ -6,8 +6,9 @@ from urllib.parse import urlparse, unquote, parse_qs, quote
 import rdflib
 from dbp_client import logging, LDF_MEMENTO_URL,\
     NAMESPACES, LITERAL_TEMPLATE, URI_TEMPLATE,\
-    ROW_TEMPLATE, HTML_TEMPLATE, DBPEDIA_VERSIONS, SERIALIZERS
+    ROW_TEMPLATE, HTML_TEMPLATE, DBPEDIA_VERSIONS, SERIALIZERS, TIMEGATE_PATH
 import re
+from datetime import datetime
 
 
 __author__ = 'Harihar Shankar'
@@ -44,7 +45,7 @@ class MementoHandler(object):
 
         subject_url = "http://dbpedia.org/resource/%s" % subject  # type: str
         logging.info("subj url " + subject_url)
-        db_version = MementoHandler.get_db_version(mem_dt)
+        db_version, mem_dt = MementoHandler.get_db_version(mem_dt)
         logging.info("db version: " + db_version)
 
         mem_url = LDF_MEMENTO_URL % (db_version, quote(subject_url))
@@ -67,9 +68,31 @@ class MementoHandler(object):
                 sub_graph.add(sub)
             data = sub_graph.serialize(format=response_ct)
 
+        link_header = self.create_link_header(subject_url)
         self.start_response("200 OK",
-                            [("Content-Type", SERIALIZERS.get(response_ct))])
+                            [
+                                ("Content-Type", SERIALIZERS.get(response_ct)),
+                                ("Link", link_header),
+                                ("Memento-Datetime", MementoHandler.get_http_date(mem_dt))
+                             ])
         return [data]
+
+    @staticmethod
+    def get_http_date(date_str: str) -> str:
+        dt = datetime.strptime(date_str, "%Y%m%d%H%M%S")
+        return dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
+
+    def create_link_header(self, subject_url: str) -> str:
+        link_tmpl = "<%s>; rel=\"%s\""
+        link_header = []  # type: List[str]
+        link_header.append(link_tmpl % (subject_url, "original"))
+
+        mem_url = self.host + self.env.get("REQUEST_URI")
+        link_header.append(link_tmpl % (mem_url, "memento"))
+
+        tg_url = self.host + TIMEGATE_PATH + "/" + subject_url
+        link_header.append(link_tmpl % (tg_url, " timegate"))
+        return ",".join(link_header)
 
     @staticmethod
     def serialize_to_html(graph: rdflib.Graph, subject_ref: rdflib.URIRef)\
@@ -173,16 +196,13 @@ class MementoHandler(object):
         return graph
 
     @staticmethod
-    def get_db_version(mem_dt: str) -> str:
-        db_version = None
+    def get_db_version(mem_dt: str) -> (str, str):
         for dbv in DBPEDIA_VERSIONS:
             if DBPEDIA_VERSIONS.get(dbv).startswith(mem_dt):
-                db_version = dbv
-                break
-        if not db_version:
-            # TODO: choose the latest memento
-            db_version = list(DBPEDIA_VERSIONS.keys())[-1]
-        return db_version
+                return dbv, DBPEDIA_VERSIONS.get(dbv)
+        # TODO: choose the latest memento
+        db_version = list(DBPEDIA_VERSIONS.keys())[-1]
+        return db_version, DBPEDIA_VERSIONS.get(db_version)
 
     @staticmethod
     def get_content_type(res: str, ct_type: str, supported_ct: str) -> str:
