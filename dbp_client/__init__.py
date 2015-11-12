@@ -4,6 +4,7 @@
 import logging
 import rdflib
 import os
+import json
 
 __author__ = 'Harihar Shankar'
 
@@ -13,7 +14,8 @@ TIMEGATE_PATH = "/timegate"
 MEMENTO_PATH = "/memento"
 
 LDF_TIMEGATE_URL = "http://labs.mementoweb.org/timegate/dbpedia?subject=%s"
-LDF_MEMENTO_URL = "http://labs.mementoweb.org/%s"
+LDF_MEMENTO_URL = "http://labs.mementoweb.org/%s?subject=%s"
+LDF_CONFIG_PATH = "config/config-memento-dbpedia.json"
 
 NAMESPACES = {
     "dbpedia": rdflib.Namespace("http://dbpedia.org/ontology/"),
@@ -37,6 +39,14 @@ NAMESPACES = {
     "purl": rdflib.Namespace("http://purl.org/linguistics/gold/")
 }
 
+
+SERIALIZERS = {
+    "xml": "application/xml",
+    "n3": "text/n3",
+    "turtle": "text/turtle",
+    "nt": "application/n-triples",
+    "html": "text/html"
+}
 
 loglevel = "INFO"
 logging.propogate = False
@@ -74,3 +84,27 @@ fh = open(os.path.join(os.path.dirname(__file__),
                        "../static/dbpedia_template.html"))
 HTML_TEMPLATE = fh.read()
 fh.close()
+
+ldf_config = json.load(open(LDF_CONFIG_PATH))
+
+DBPEDIA_VERSIONS = {}  # type: Dict[str, str]
+try:
+    versions = ldf_config.get("timegates").get("mementos").get("dbpedia").get("versions")
+except KeyError:
+    raise
+
+for version in versions:
+    try:
+        start = ldf_config.get("datasources").get(version).get("memento").get("interval")[0]
+    except KeyError:
+        raise
+    if not start or start == "":
+        raise ValueError
+
+    start = start.replace("-", "")
+    start = start.replace(":", "")
+    start = start.replace("T", "")
+    start = start.replace("Z", "")
+    DBPEDIA_VERSIONS[version] = start
+
+# logging.info(DBPEDIA_VERSIONS)

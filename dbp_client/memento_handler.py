@@ -5,7 +5,8 @@ Displays the memento page of a dbpedia resource.
 from urllib.parse import urlparse, unquote, parse_qs, quote
 import rdflib
 from dbp_client import logging, LDF_MEMENTO_URL,\
-    NAMESPACES, LITERAL_TEMPLATE, URI_TEMPLATE, ROW_TEMPLATE, HTML_TEMPLATE
+    NAMESPACES, LITERAL_TEMPLATE, URI_TEMPLATE,\
+    ROW_TEMPLATE, HTML_TEMPLATE, DBPEDIA_VERSIONS, SERIALIZERS
 import re
 
 
@@ -21,49 +22,58 @@ class MementoHandler(object):
         self.env = env
         self.start_response = start_response
         self.host = env.get("UWSGI_ROUTER") + "://" + env.get("HTTP_HOST")
-        self.dbp_re = re.compile('/[0-9]{4,14}/http://dbpedia.org/(data|page)/(.+?)(\\.(rdf|html|n3|json|xml))?$')
+        self.dbp_re = re.compile('([0-9]{4,14})/http://dbpedia.org/(data|page)/(.+?)(\\.(rdf|html|n3|json|xml))?$')
 
     def handle(self):
         mem_path = self.env.get("REQUEST_URI")
         mem_path = mem_path.split("/memento/")[1]
 
-        mem_url = LDF_MEMENTO_URL % mem_path
+        logging.info("mem path: " + mem_path)
+        match = self.dbp_re.match(mem_path)
+        response_ct = ""  # type: str
+        if match:
+            (mem_dt, res, subject, ct_type, supported_ct) = match.groups()
+            logging.info("groups: %s, %s, %s, %s, %s" %
+                         (mem_dt, res, subject, ct_type, supported_ct))
+            response_ct = MementoHandler.get_content_type(res,
+                                                          ct_type,
+                                                          supported_ct)
+        else:
+            self.start_response("404", [("Content-Type", "text/html")])
+            return [b'Resource Not Found!']
 
-        logging.info("mem url: %s" % mem_url)
-        subject_url = parse_qs(urlparse(mem_url).query).get("subject")[0]
-        subject_url = unquote(subject_url)
+        subject_url = "http://dbpedia.org/resource/%s" % subject  # type: str
         logging.info("subj url " + subject_url)
+        db_version = MementoHandler.get_db_version(mem_dt)
+        logging.info("db version: " + db_version)
 
-        graph = rdflib.Graph()
-        graph.load(mem_url, format="n3")
+        mem_url = LDF_MEMENTO_URL % (db_version, quote(subject_url))
+        # type: str
+        logging.info("mem url: %s" % mem_url)
 
-        logging.info("graph is of length: %s" % len(graph))
-
+        graph = MementoHandler.get_graph(mem_url)
         subject_ref = rdflib.URIRef(subject_url)
-        mem_ref = rdflib.URIRef(mem_url)
 
-        try:
-            next_page = next(graph.objects(mem_ref,
-                                        NAMESPACES.get("hydra")["nextPage"]))
-        except StopIteration:
-            next_page = None
+        if response_ct == "html":
+            data = MementoHandler.serialize_to_html(graph, subject_ref)
+            data = data.encode("utf-8")
+        else:
+            sub_graph = rdflib.Graph()
+            sub_po = graph.predicate_objects(subject_ref)
+            sub_g = [(subject_ref, p, MementoHandler.url_fix(o))
+                     for p, o in sub_po]
 
-        logging.info("next page: " + str(next_page))
-        while next_page:
-            g = rdflib.Graph()
-            g.load(next_page, format="n3")
-            try:
-                subset_url = next(g.objects(mem_ref,
-                                            NAMESPACES.get("void")["subset"]))
-                next_page = next(g.objects(rdflib.URIRef(subset_url),
-                                        NAMESPACES.get("hydra")["nextPage"]))
-            except StopIteration:
-                next_page = None
+            for sub in sub_g:
+                sub_graph.add(sub)
+            data = sub_graph.serialize(format=response_ct)
 
-            graph += [(s, p, MementoHandler.url_fix(o)) for s, p, o in g]
+        self.start_response("200 OK",
+                            [("Content-Type", SERIALIZERS.get(response_ct))])
+        return [data]
 
-        logging.info("graph is of length: %s" % len(graph))
-
+    @staticmethod
+    def serialize_to_html(graph: rdflib.Graph, subject_ref: rdflib.URIRef)\
+            -> str:
         abstract = [abst for abst in graph.objects(
             subject_ref, NAMESPACES["rdflib"]["comment"])]
         if not abstract:
@@ -121,7 +131,7 @@ class MementoHandler(object):
             row_count += 1
 
         html_table = "".join(table)
-        sub_prefix, subj_name = MementoHandler.split_uri(subject_url)
+        sub_prefix, subj_name = MementoHandler.split_uri(str(subject_ref))
         table_name = subj_name.replace("_", " ")
         data = HTML_TEMPLATE % {
             "NAME": subj_name,
@@ -129,9 +139,66 @@ class MementoHandler(object):
             "DESC": abstract,
             "TABLE": html_table
         }
+        return data
 
-        self.start_response("200 OK", [("Content-Type", "text/html")])
-        return [data.encode("utf-8")]
+
+    @staticmethod
+    def get_graph(mem_url: str) -> rdflib.Graph:
+        graph = rdflib.Graph()
+        graph.load(mem_url, format="n3")
+        logging.info("graph is of length: %s" % len(graph))
+
+        mem_ref = rdflib.URIRef(mem_url)
+        try:
+            next_page = next(graph.objects(mem_ref,
+                                           NAMESPACES.get("hydra")["nextPage"]))
+        except StopIteration:
+            next_page = None
+
+        logging.info("next page: " + str(next_page))
+        while next_page:
+            g = rdflib.Graph()
+            g.load(next_page, format="n3")
+            try:
+                subset_url = next(g.objects(mem_ref,
+                                            NAMESPACES.get("void")["subset"]))
+                next_page = next(g.objects(rdflib.URIRef(subset_url),
+                                           NAMESPACES.get("hydra")["nextPage"]))
+            except StopIteration:
+                next_page = None
+
+            graph += [(s, p, MementoHandler.url_fix(o)) for s, p, o in g]
+
+        logging.info("graph is of length: %s" % len(graph))
+        return graph
+
+    @staticmethod
+    def get_db_version(mem_dt: str) -> str:
+        db_version = None
+        for dbv in DBPEDIA_VERSIONS:
+            if DBPEDIA_VERSIONS.get(dbv).startswith(mem_dt):
+                db_version = dbv
+                break
+        if not db_version:
+            # TODO: choose the latest memento
+            db_version = list(DBPEDIA_VERSIONS.keys())[-1]
+        return db_version
+
+    @staticmethod
+    def get_content_type(res: str, ct_type: str, supported_ct: str) -> str:
+        if res == "page":
+            response_ct = "html"
+        elif not ct_type:
+            response_ct = "rdfxml"
+        elif supported_ct == "xml":
+            response_ct = "rdfxml"
+        else:
+            response_ct = supported_ct
+
+        if response_ct not in SERIALIZERS:
+            response_ct = "n3"
+
+        return response_ct
 
     @staticmethod
     def split_uri(uri: str) -> (str, str):
