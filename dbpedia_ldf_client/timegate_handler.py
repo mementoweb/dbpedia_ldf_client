@@ -22,14 +22,13 @@ class TimegateHandler(object):
     def __init__(self, env, start_response):
         self.env = env
         self.start_response = start_response
-        self.host = env.get("UWSGI_ROUTER") + "://" + env.get("HTTP_HOST")
+        self.host = env.get("UWSGI_ROUTER", "http") + "://" + env.get("HTTP_HOST")
 
     def handle(self):
         req_uri = self.env.get("REQUEST_URI")  # type: str
         subject_uri = req_uri.split("/timegate/")[1]  # type: str
+        original_uri = subject_uri  # type: str
         subject_uri = quote(subject_uri)
-
-        original_uri = self.host + req_uri  # type: str
 
         accept_dt = self.env.get("HTTP_ACCEPT_DATETIME")  # type: str
         if not bool(accept_dt):
@@ -55,7 +54,7 @@ class TimegateHandler(object):
         mem_url = "%s%s/%s/%s" % (self.host, MEMENTO_PATH,
                                   mem_time, unquote(subject_uri))  # type: str
 
-        self.start_response("303", [
+        self.start_response("302", [
             ("Location", mem_url),
             ("Vary", "accept-datetime"),
             ("Link", "<%s>; rel=\"original\"" % original_uri)

@@ -22,7 +22,7 @@ class MementoHandler(object):
     def __init__(self, env, start_response):
         self.env = env
         self.start_response = start_response
-        self.host = env.get("UWSGI_ROUTER") + "://" + env.get("HTTP_HOST")
+        self.host = env.get("UWSGI_ROUTER", "http") + "://" + env.get("HTTP_HOST")
         self.dbp_re = re.compile('([0-9]{4,14})/http://dbpedia.org/(data|page)/(.+?)(\\.(rdf|html|n3|json|xml))?$')
 
     def handle(self):
@@ -38,7 +38,8 @@ class MementoHandler(object):
                          (mem_dt, res, subject, ct_type, supported_ct))
             response_ct = MementoHandler.get_content_type(res,
                                                           ct_type,
-                                                          supported_ct)
+                                                          supported_ct,
+                                                          self.env.get("HTTP_ACCEPT"))
         else:
             self.start_response("404", [("Content-Type", "text/html")])
             return [b'Resource Not Found!']
@@ -91,7 +92,7 @@ class MementoHandler(object):
         link_header.append(link_tmpl % (mem_url, "memento"))
 
         tg_url = self.host + TIMEGATE_PATH + "/" + subject_url
-        link_header.append(link_tmpl % (tg_url, " timegate"))
+        link_header.append(link_tmpl % (tg_url, "timegate"))
         return ",".join(link_header)
 
     @staticmethod
@@ -114,8 +115,11 @@ class MementoHandler(object):
         for pref, ns in NAMESPACES.items():
             ns_by_uri[ns] = pref
 
+        pred_obj = list(graph.predicate_objects(subject_ref))
+        pred_obj.sort()
+
         po = {}
-        for predicate, obj in graph.predicate_objects(subject_ref):
+        for predicate, obj in pred_obj:
             if not po.get(predicate):
                 po[predicate] = []
             p_prefix, p_name = MementoHandler.split_uri(str(predicate))
@@ -133,7 +137,7 @@ class MementoHandler(object):
                     "CLASS": "uri",
                     "ONT": p_name,
                     "NS": ns_prefix,
-                    "URI": str(obj)
+                    "URI": unquote(str(obj).replace("\\", ""))
                 })
 
         for predicate in po:
@@ -205,13 +209,20 @@ class MementoHandler(object):
         return db_version, DBPEDIA_VERSIONS.get(db_version)
 
     @staticmethod
-    def get_content_type(res: str, ct_type: str, supported_ct: str) -> str:
+    def get_content_type(res: str, ct_type: str, supported_ct: str,
+                         accept: str) -> str:
+        response_ct = "n3"
         if res == "page":
             response_ct = "html"
+        elif accept and accept in SERIALIZERS.values():
+            for ct in SERIALIZERS:
+                if accept == SERIALIZERS.get(ct):
+                    response_ct = ct
+                    break
         elif not ct_type:
-            response_ct = "rdfxml"
+            response_ct = "xml"
         elif supported_ct == "xml":
-            response_ct = "rdfxml"
+            response_ct = "xml"
         else:
             response_ct = supported_ct
 
