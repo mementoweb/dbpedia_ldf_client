@@ -67,7 +67,8 @@ class MementoHandler(object):
 
             for sub in sub_g:
                 sub_graph.add(sub)
-            data = sub_graph.serialize(format=response_ct)
+            resp_format = response_ct if response_ct != "rdfxml" else "xml"
+            data = sub_graph.serialize(format=resp_format)
 
         link_header = self.create_link_header(subject_url)
         self.start_response("200 OK",

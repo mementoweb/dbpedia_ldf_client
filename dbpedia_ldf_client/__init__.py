@@ -42,6 +42,7 @@ NAMESPACES = {
 
 SERIALIZERS = {
     "xml": "application/xml",
+    "rdfxml": "application/rdf+xml",
     "n3": "text/n3",
     "turtle": "text/turtle",
     "nt": "application/n-triples",
