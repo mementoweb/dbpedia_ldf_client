@@ -13,8 +13,8 @@ SERVER_PATH = "/dbpedia"
 TIMEGATE_PATH = "/timegate"
 MEMENTO_PATH = "/memento"
 
-LDF_TIMEGATE_URL = "http://labs.mementoweb.org/timegate/dbpedia?subject=%s"
-LDF_MEMENTO_URL = "http://labs.mementoweb.org/%s?subject=%s"
+LDF_TIMEGATE_URL = "http://localhost:3000/timegate/dbpedia?subject=%s"
+LDF_MEMENTO_URL = "http://localhost:3000/%s?subject=%s"
 LDF_CONFIG_PATH = "config/config-memento-dbpedia.json"
 
 NAMESPACES = {
