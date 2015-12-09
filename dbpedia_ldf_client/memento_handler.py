@@ -6,7 +6,8 @@ from urllib.parse import unquote, quote
 import rdflib
 from dbpedia_ldf_client import logging, LDF_MEMENTO_URL, MEMENTO_PATH, \
     NAMESPACES, LITERAL_TEMPLATE, URI_TEMPLATE,\
-    ROW_TEMPLATE, HTML_TEMPLATE, DBPEDIA_VERSIONS, SERIALIZERS, TIMEGATE_PATH
+    ROW_TEMPLATE, HTML_TEMPLATE, DBPEDIA_VERSIONS, SERIALIZERS, TIMEGATE_PATH,\
+    TIMEMAP_PATH
 import re
 from datetime import datetime
 from typing import List
@@ -95,6 +96,10 @@ class MementoHandler(object):
 
         tg_url = self.host + TIMEGATE_PATH + "/" + subject_url
         link_header.append(link_tmpl % (tg_url, "timegate"))
+
+        tm_url = self.host + TIMEMAP_PATH + "/" + subject_url
+        link_header.append(link_tmpl % (tm_url, "timemap"))
+
         return ",".join(link_header)
 
     @staticmethod

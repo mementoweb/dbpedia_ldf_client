@@ -37,7 +37,7 @@ class TimemapHandler(object):
 
         #subject_url = "http://dbpedia.org/resource/%s" % subject  # type: str
         req_subject_url = "http://dbpedia.org/%s/%s" % (res, subject)  # type: str
-        logging.info("subj url " + subject_url)
+        logging.info("subj url " + req_subject_url)
 
         mem_dts = DBPEDIA_VERSIONS.values()  # type: List[str]
         timemap = {}  # type: Dict[str, List[Dict[str, str]]]

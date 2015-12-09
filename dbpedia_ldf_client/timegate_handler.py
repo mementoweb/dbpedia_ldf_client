@@ -6,7 +6,8 @@ response. May make multiple queries to the LDF server for one request.
 
 import requests
 from urllib.parse import quote, urlparse, unquote
-from dbpedia_ldf_client import logging, LDF_TIMEGATE_URL, MEMENTO_PATH, DBPEDIA_VERSIONS
+from dbpedia_ldf_client import logging, LDF_TIMEGATE_URL, MEMENTO_PATH,\
+    DBPEDIA_VERSIONS, TIMEMAP_PATH
 from memento_client import MementoClient
 from datetime import datetime
 
@@ -55,6 +56,15 @@ class TimegateHandler(object):
 
         mem_url = "%s%s/%s/%s" % (self.host, MEMENTO_PATH,
                                   mem_time, unquote(subject_uri))  # type: str
+
+        link_tmpl = "<%s>; rel=\"%s\""
+        link_hdr = link_tmpl % (original_uri, "original")
+        link_hdr += "," + link_tmpl % (
+            self.host + TIMEMAP_PATH + "/link/" + original_uri, "timemap")
+        link_hdr += "; type=\"application/link-header\""
+        link_hdr += "," + link_tmpl % (
+            self.host + TIMEMAP_PATH + "/json/" + original_uri, "timemap")
+        link_hdr += "; type=\"application/json\""
 
         self.start_response("302", [
             ("Location", mem_url),
