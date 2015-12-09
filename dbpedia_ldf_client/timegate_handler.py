@@ -39,7 +39,9 @@ class TimegateHandler(object):
 
         ldf_resp = requests.head(LDF_TIMEGATE_URL % subject_uri,
                                  headers={"Accept-Datetime": accept_dt},
-                                 allow_redirects=False)  # type: Response
+                                 allow_redirects=False)
+        """ type: requests.Response """
+
         loc_url = ldf_resp.headers.get("location")  # type: str
         logging.info("Received Memento URL from TG %s." % loc_url)
 

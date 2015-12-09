@@ -2,14 +2,14 @@
 Displays the memento page of a dbpedia resource.
 """
 
-from urllib.parse import urlparse, unquote, parse_qs, quote
+from urllib.parse import unquote, quote
 import rdflib
 from dbpedia_ldf_client import logging, LDF_MEMENTO_URL,\
     NAMESPACES, LITERAL_TEMPLATE, URI_TEMPLATE,\
     ROW_TEMPLATE, HTML_TEMPLATE, DBPEDIA_VERSIONS, SERIALIZERS, TIMEGATE_PATH
 import re
 from datetime import datetime
-
+from typing import List
 
 __author__ = 'Harihar Shankar'
 
@@ -27,7 +27,7 @@ class MementoHandler(object):
 
     def handle(self):
         mem_path = self.env.get("REQUEST_URI")
-        mem_path = mem_path.split("/memento/")[1]
+        mem_path = mem_path.split(TIMEGATE_PATH)[1]
 
         logging.info("mem path: " + mem_path)
         match = self.dbp_re.match(mem_path)

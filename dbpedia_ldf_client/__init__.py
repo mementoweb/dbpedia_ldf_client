@@ -5,6 +5,7 @@ import logging
 import rdflib
 import os
 import json
+from typing import Dict
 
 __author__ = 'Harihar Shankar'
 
@@ -12,6 +13,7 @@ __author__ = 'Harihar Shankar'
 SERVER_PATH = "/dbpedia"
 TIMEGATE_PATH = "/timegate"
 MEMENTO_PATH = "/memento"
+TIMEMAP_PATH = "/timemap"
 
 LDF_TIMEGATE_URL = "http://localhost:3000/timegate/dbpedia?subject=%s"
 LDF_MEMENTO_URL = "http://localhost:3000/%s?subject=%s"
