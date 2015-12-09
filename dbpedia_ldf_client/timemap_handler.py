@@ -20,16 +20,16 @@ class TimemapHandler(object):
         self.env = env
         self.start_response = start_response
         self.host = env.get("UWSGI_ROUTER", "http") + "://" + env.get("HTTP_HOST")
-        self.tm_re = re.compile('(link|json)/http://dbpedia.org/data|page/(.+?)\\.rdf|html|n3|json|xml?$')
+        self.tm_re = re.compile('(link|json)/http://dbpedia.org/(data|page)/(.+?)(\\.rdf|html|n3|json|xml)?$')
 
     def handle(self):
         mem_path = self.env.get("REQUEST_URI")
-        mem_path = mem_path.split(TIMEMAP_PATH)[1]
+        mem_path = mem_path.split(TIMEMAP_PATH + "/")[1]
 
         logging.info("mem path: " + mem_path)
         match = self.tm_re.match(mem_path)
         if match:
-            (tm_type, subject) = match.groups()
+            (tm_type, res, subject, ct) = match.groups()
             logging.info("groups: %s, %s" % (tm_type, subject))
         else:
             self.start_response("404", [("Content-Type", "text/html")])
