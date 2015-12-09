@@ -45,6 +45,7 @@ class MementoHandler(object):
             return [b'Resource Not Found!']
 
         subject_url = "http://dbpedia.org/resource/%s" % subject  # type: str
+        req_subject_url = "http://dbpedia.org/%s/%s" % (res, subject)  # type: str
         logging.info("subj url " + subject_url)
         db_version, mem_dt = MementoHandler.get_db_version(mem_dt)
         logging.info("db version: " + db_version)
@@ -70,7 +71,7 @@ class MementoHandler(object):
             resp_format = response_ct if response_ct != "rdfxml" else "xml"
             data = sub_graph.serialize(format=resp_format)
 
-        link_header = self.create_link_header(subject_url)
+        link_header = self.create_link_header(req_subject_url)
         self.start_response("200 OK",
                             [
                                 ("Content-Type", SERIALIZERS.get(response_ct)),

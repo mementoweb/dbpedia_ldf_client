@@ -9,7 +9,7 @@ from typing import List, Dict
 import re
 from datetime import datetime
 from memento_client import MementoClient
-
+import json
 
 __author__ = 'Harihar Shankar'
 
@@ -35,16 +35,20 @@ class TimemapHandler(object):
             self.start_response("404", [("Content-Type", "text/html")])
             return [b'Resource Not Found!']
 
-        subject_url = "http://dbpedia.org/resource/%s" % subject  # type: str
+        #subject_url = "http://dbpedia.org/resource/%s" % subject  # type: str
+        req_subject_url = "http://dbpedia.org/%s/%s" % (res, subject)  # type: str
         logging.info("subj url " + subject_url)
 
         mem_dts = DBPEDIA_VERSIONS.values()  # type: List[str]
         timemap = {}  # type: Dict[str, List[Dict[str, str]]]
         timemap["memento"] = []
+        timemap["timegate"] = []
+        timemap["original"] = []
+        timemap["self"] = []
         mem_url_tmpl = self.host + MEMENTO_PATH + "/%s/%s"
         for mem_dt in mem_dts:
             dt = datetime.strptime(mem_dt, "%Y%m%d%H%M%S")
-            mem_url = mem_url_tmpl % (mem_dt, subject_url)
+            mem_url = mem_url_tmpl % (mem_dt, req_subject_url)
             timemap["memento"].append(
                 {
                     "uri": mem_url,
@@ -52,15 +56,20 @@ class TimemapHandler(object):
                  })
 
         timemap["timegate"].append(
-            {"uri": self.host + TIMEGATE_PATH + "/" + subject_url})
-        timemap["original"].append({"uri": subject_url})
+            {"uri": self.host + TIMEGATE_PATH + "/" + req_subject_url})
+        timemap["original"].append({"uri": req_subject_url})
         timemap["self"].append(
             {"uri": self.host + self.env.get("REQUEST_URI"),
              "type": "application/link-header"}
         )
 
-        tm = self.create_link_timemap(timemap)
-        return []
+        if tm_type == "link":
+            tm = self.create_link_timemap(timemap)
+            self.start_response("200 OK", [("Content-Type", "application/link-header")])
+        else:
+            tm = json.dumps(timemap)
+            self.start_response("200 OK", [("Content-Type", "application/json")])
+        return [tm.encode("utf8")]
 
     def create_link_timemap(self, timemap: Dict[str, List[Dict[str, str]]]) -> str:
         link_tmpl = "<%s>; rel=\"%s\""
@@ -70,9 +79,9 @@ class TimemapHandler(object):
                 link_val = link_tmpl % (link.get("uri"), rel)
                 for attr in link:
                     if attr != "uri":
-                        link_val += "; " + attr + "=" + link.get(attr)
+                        link_val += "; " + attr + "=\"" + link.get(attr) + "\""
                 link_header.append(link_val)
-        return ",".join(link_header)
+        return ",\n".join(link_header)
 
     def create_link_header(self, subject_url: str) -> str:
         link_tmpl = "<%s>; rel=\"%s\""
