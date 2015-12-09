@@ -62,9 +62,10 @@ class TimegateHandler(object):
         link_hdr += "," + link_tmpl % (
             self.host + TIMEMAP_PATH + "/link/" + original_uri, "timemap")
         link_hdr += "; type=\"application/link-header\""
-        link_hdr += "," + link_tmpl % (
-            self.host + TIMEMAP_PATH + "/json/" + original_uri, "timemap")
-        link_hdr += "; type=\"application/json\""
+
+        #link_hdr += "," + link_tmpl % (
+        #    self.host + TIMEMAP_PATH + "/json/" + original_uri, "timemap")
+        #link_hdr += "; type=\"application/json\""
 
         self.start_response("302", [
             ("Location", mem_url),

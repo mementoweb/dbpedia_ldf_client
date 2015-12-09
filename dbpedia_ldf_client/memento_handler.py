@@ -97,7 +97,7 @@ class MementoHandler(object):
         tg_url = self.host + TIMEGATE_PATH + "/" + subject_url
         link_header.append(link_tmpl % (tg_url, "timegate"))
 
-        tm_url = self.host + TIMEMAP_PATH + "/" + subject_url
+        tm_url = self.host + TIMEMAP_PATH + "/link/" + subject_url
         link_header.append(link_tmpl % (tm_url, "timemap"))
 
         return ",".join(link_header)
