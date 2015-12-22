@@ -70,6 +70,6 @@ class TimegateHandler(object):
         self.start_response("302", [
             ("Location", mem_url),
             ("Vary", "accept-datetime"),
-            ("Link", "<%s>; rel=\"original\"" % original_uri)
+            ("Link", link_hdr)
         ])
         return []

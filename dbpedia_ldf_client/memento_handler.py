@@ -100,7 +100,7 @@ class MementoHandler(object):
         tm_url = self.host + TIMEMAP_PATH + "/link/" + subject_url
         link_header.append(link_tmpl % (tm_url, "timemap"))
 
-        return ",".join(link_header)
+        return ", ".join(link_header)
 
     @staticmethod
     def serialize_to_html(graph: rdflib.Graph, subject_ref: rdflib.URIRef)\
