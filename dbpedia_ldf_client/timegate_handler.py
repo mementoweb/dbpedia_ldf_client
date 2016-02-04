@@ -35,9 +35,11 @@ class TimegateHandler(object):
 
         if bool(accept_dt):
             try:
+                logging.info("Checking validity of acc dt: %s" % accept_dt)
                 MementoClient.convert_to_datetime(accept_dt)
             except ValueError:
-                self.start_response(400)
+                logging.info("Invalid acc dt, issuing 400.")
+                self.start_response("400")
                 return ["The requested Accept-Datetime cannot be parsed."]
         else:
             accept_dt = MementoClient.convert_to_http_datetime(datetime.now())
@@ -70,9 +72,9 @@ class TimegateHandler(object):
         link_hdr = link_tmpl % (original_uri, "original")
         link_hdr += "," + link_tmpl % (
             self.host + TIMEMAP_PATH + "/link/" + original_uri, "timemap")
-        link_hdr += "; type=\"application/link-header\""
+        link_hdr += "; type=\"application/link-format\""
         link_hdr += "," + link_tmpl % (mem_url, "memento")
-        link_hdr += "; datetime=\"" + mem_url + "\""
+        link_hdr += "; datetime=\"" + mem_http_dt + "\""
 
         #link_hdr += "," + link_tmpl % (
         #    self.host + TIMEMAP_PATH + "/json/" + original_uri, "timemap")

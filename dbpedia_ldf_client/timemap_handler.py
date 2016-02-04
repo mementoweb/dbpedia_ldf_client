@@ -65,7 +65,7 @@ class TimemapHandler(object):
 
         if tm_type == "link":
             tm = self.create_link_timemap(timemap)
-            self.start_response("200 OK", [("Content-Type", "application/link-header")])
+            self.start_response("200 OK", [("Content-Type", "application/link-format")])
         else:
             tm = json.dumps(timemap)
             self.start_response("200 OK", [("Content-Type", "application/json")])
