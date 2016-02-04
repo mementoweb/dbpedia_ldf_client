@@ -32,7 +32,14 @@ class TimegateHandler(object):
         subject_uri = quote(subject_uri)
 
         accept_dt = self.env.get("HTTP_ACCEPT_DATETIME")  # type: str
-        if not bool(accept_dt):
+
+        if bool(accept_dt):
+            try:
+                MementoClient.convert_to_datetime(accept_dt)
+            except ValueError:
+                self.start_response(400)
+                return ["The requested Accept-Datetime cannot be parsed."]
+        else:
             accept_dt = MementoClient.convert_to_http_datetime(datetime.now())
 
         logging.info("Fetching response from timegate %s with accept dt %s"
@@ -54,6 +61,8 @@ class TimegateHandler(object):
         if not mem_time:
             raise ValueError
 
+        mem_dt = datetime.strptime(mem_time, "%Y%m%d%H%M%S")
+        mem_http_dt = MementoClient.convert_to_http_datetime(mem_dt)
         mem_url = "%s%s/%s/%s" % (self.host, MEMENTO_PATH,
                                   mem_time, unquote(subject_uri))  # type: str
 
@@ -62,6 +71,8 @@ class TimegateHandler(object):
         link_hdr += "," + link_tmpl % (
             self.host + TIMEMAP_PATH + "/link/" + original_uri, "timemap")
         link_hdr += "; type=\"application/link-header\""
+        link_hdr += "," + link_tmpl % (mem_url, "memento")
+        link_hdr += "; datetime=\"" + mem_url + "\""
 
         #link_hdr += "," + link_tmpl % (
         #    self.host + TIMEMAP_PATH + "/json/" + original_uri, "timemap")
