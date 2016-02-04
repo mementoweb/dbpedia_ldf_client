@@ -72,7 +72,8 @@ class MementoHandler(object):
             resp_format = response_ct if response_ct != "rdfxml" else "xml"
             data = sub_graph.serialize(format=resp_format)
 
-        link_header = self.create_link_header(req_subject_url)
+        link_header = self.create_link_header(req_subject_url,
+                                              MementoHandler.get_http_date(mem_dt))
         self.start_response("200 OK",
                             [
                                 ("Content-Type", SERIALIZERS.get(response_ct)),
@@ -86,13 +87,14 @@ class MementoHandler(object):
         dt = datetime.strptime(date_str, "%Y%m%d%H%M%S")
         return dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
-    def create_link_header(self, subject_url: str) -> str:
+    def create_link_header(self, subject_url: str, mem_dt: str) -> str:
         link_tmpl = "<%s>; rel=\"%s\""
         link_header = []  # type: List[str]
         link_header.append(link_tmpl % (subject_url, "original"))
 
         mem_url = self.host + self.env.get("REQUEST_URI")
-        link_header.append(link_tmpl % (mem_url, "memento"))
+        link_header.append(link_tmpl % (mem_url, "memento") +
+                           "; datetime=\"" + mem_dt + "\"")
 
         tg_url = self.host + TIMEGATE_PATH + "/" + subject_url
         link_header.append(link_tmpl % (tg_url, "timegate"))

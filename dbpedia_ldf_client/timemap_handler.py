@@ -60,7 +60,7 @@ class TimemapHandler(object):
         timemap["original"].append({"uri": req_subject_url})
         timemap["self"].append(
             {"uri": self.host + self.env.get("REQUEST_URI"),
-             "type": "application/link-header"}
+             "type": "application/link-format"}
         )
 
         if tm_type == "link":

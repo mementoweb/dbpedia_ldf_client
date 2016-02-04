@@ -39,7 +39,7 @@ class TimegateHandler(object):
                 MementoClient.convert_to_datetime(accept_dt)
             except ValueError:
                 logging.info("Invalid acc dt, issuing 400.")
-                self.start_response("400")
+                self.start_response("400", [])
                 return ["The requested Accept-Datetime cannot be parsed."]
         else:
             accept_dt = MementoClient.convert_to_http_datetime(datetime.now())
