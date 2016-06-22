@@ -21,7 +21,7 @@ def application(env, start_response):
     :return:
     """
 
-    req_path = env.get("PATH_INFO", "/")
+req_path = env.get("PATH_INFO", "/")
 
     if not req_path.startswith("/"):
         req_path = "/" + req_path

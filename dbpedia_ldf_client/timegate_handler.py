@@ -53,6 +53,8 @@ class TimegateHandler(object):
         """ type: requests.Response """
 
         loc_url = ldf_resp.headers.get("location")  # type: str
+        if not loc_url:
+            loc_url = ldf_resp.headers.get("content-location")  # type: str
         logging.info("Received Memento URL from TG %s." % loc_url)
 
         loc_parts = urlparse(loc_url)
