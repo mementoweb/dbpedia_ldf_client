@@ -1,0 +1,4 @@
+requests>=2.0
+uwsgi>=2.0
+rdflib>=4.0
+memento_client>=0.5
