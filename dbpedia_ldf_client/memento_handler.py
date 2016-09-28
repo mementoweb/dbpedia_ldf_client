@@ -221,6 +221,10 @@ class MementoHandler(object):
     def get_content_type(res: str, ct_type: str, supported_ct: str,
                          accept: str) -> str:
         response_ct = "n3"
+
+        accept = accept.split(",")[0]
+        accept = accept.split(";")[0]
+
         if res == "page":
             response_ct = "html"
         elif accept and accept in SERIALIZERS.values():

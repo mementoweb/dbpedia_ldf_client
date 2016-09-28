@@ -9,6 +9,7 @@ from urllib.parse import quote, urlparse, unquote
 from dbpedia_ldf_client import logging, LDF_TIMEGATE_URL, MEMENTO_PATH,\
     DBPEDIA_VERSIONS, TIMEMAP_PATH
 from memento_client import MementoClient
+from dbpedia_ldf_client.memento_handler import MementoHandler
 from datetime import datetime
 
 __author__ = 'Harihar Shankar'
@@ -29,8 +30,21 @@ class TimegateHandler(object):
         req_uri = self.env.get("REQUEST_URI")  # type: str
         subject_uri = req_uri.split("/timegate/")[1]  # type: str
         original_uri = subject_uri  # type: str
-        subject_uri = quote(subject_uri)
 
+        # fix for issue #1
+        if original_uri.find("dbpedia.org/resource/") > 0:
+            ct = MementoHandler.get_content_type("", "", "", self.env.get("HTTP_ACCEPT"))
+            if ct == "html":
+                new_tg_url = req_uri.replace("dbpedia.org/resource/", "dbpedia.org/page/")
+            else:
+                new_tg_url = req_uri.replace("dbpedia.org/resource/", "dbpedia.org/data/")
+
+            self.start_response("303", [
+                ("Location", self.host + new_tg_url)
+            ])
+            return []
+
+        subject_uri = quote(subject_uri)
         accept_dt = self.env.get("HTTP_ACCEPT_DATETIME")  # type: str
 
         if bool(accept_dt):
